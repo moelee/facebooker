@@ -288,6 +288,13 @@ class Facebooker::SessionTest < Test::Unit::TestCase
     @session.expects(:post).with('facebook.notifications.send',{:to_ids=>"1",:notification=>"a", :type=>"app_to_user"},false)
     @session.send_notification(["1"],"a")
   end
+  
+  def test_can_send_news_items
+    @session = Facebooker::Session.create(ENV['FACEBOOK_API_KEY'], ENV['FACEBOOK_SECRET_KEY'])
+    news = [{:message => "i am a news item", :action_link => {:text => "source", :href => "href"}}]
+    @session.expects(:post).with('facebook.dashboard.addNews',{:uid=>"1",:news => news},false)
+    @session.send_news_items("1", news)
+  end
 
   def test_can_register_template_bundle
     expect_http_posts_with_responses(example_register_template_bundle_return_xml)

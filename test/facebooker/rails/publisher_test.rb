@@ -538,14 +538,14 @@ class Facebooker::Rails::Publisher::PublisherTest < Test::Unit::TestCase
   end
   
   def test_create_news_item
-    news_item = TestPublisher.create_news_item(@user)
+    news_item = TestPublisher.create_news_item(12451753, @user)
     assert_equal Facebooker::Rails::Publisher::NewsItem,news_item.class
     assert_equal "News", news_item.message
     assert_equal({:text => "Source", :href => "HREF"}, news_item.news_action_link)
   end
   
   def test_deliver_news_item
-    @session.expects(:send_news_item)
+    @session.expects(:send_news_items)
     TestPublisher.deliver_news_item(12451752, @user)
   end
 end
