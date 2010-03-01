@@ -4,7 +4,7 @@ module Facebooker
     # 
     # To use, create a subclass and define methods
     # Each method should start by calling send_as to specify the type of message
-    # Valid options are  :email and :notification, :user_action, :profile, :ref, :publish_stream
+    # Valid options are  :email and :notification, :user_action, :profile, :ref, :publish_stream, :news_item
     # 
     #
     # Below is an example of each type
@@ -87,6 +87,16 @@ module Facebooker
     #       message params[:message]
     #       action_links params[:action_links]
     #     end
+    # 
+    #     # Add a news item to the user's dashboard
+    #      def news_item(user)
+    #        send_as :news_item
+    #        from nil
+    #        recipients user
+    #        message "News"
+    #        news_action_link action_link("Source", "HREF")
+    #      end
+    #
     #
     #
     # To send a message, use ActionMailer like semantics
@@ -268,6 +278,11 @@ module Facebooker
         attr_accessor :action_links
         attr_accessor :message
       end
+      
+      class NewsItem
+        attr_accessor :news_action_link
+        attr_accessor :message
+      end
 
       cattr_accessor :ignore_errors
       attr_accessor :_body
@@ -309,6 +324,8 @@ module Facebooker
           UserAction.new
         when :publish_stream
           StreamPost.new
+        when :news_item
+          NewsItem.new
         else
           raise UnknownBodyType.new("Unknown type to publish")
         end
@@ -379,7 +396,7 @@ module Facebooker
       end
   
       def requires_from_user?(from,body)
-        ! (announcement_notification?(from,body) or ref_update?(body) or profile_update?(body))
+        ! (news_item?(from,body) or announcement_notification?(from,body) or ref_update?(body) or profile_update?(body))
       end
       
       def profile_update?(body)
@@ -392,6 +409,10 @@ module Facebooker
   
       def announcement_notification?(from,body)
         from.nil? and body.is_a?(Notification)
+      end
+      
+      def news_item?(from,body)
+        from.nil? and body.is_a?(NewsItem)
       end
       
       def send_message(method)
@@ -425,6 +446,8 @@ module Facebooker
           @from.session.publish_user_action(_body.template_id,_body.data_hash,_body.target_ids,_body.body_general,_body.story_size)
         when Facebooker::StreamPost
          @from.publish_to(_body.target, {:attachment => _body.attachment, :action_links => @action_links, :message => _body.message })
+        when NewsItem
+          @recipients.each {|r| r.add_news([{:message => _body.message, :action_link => _body.news_action_link}])}
         else
           raise UnspecifiedBodyType.new("You must specify a valid send_as")
         end

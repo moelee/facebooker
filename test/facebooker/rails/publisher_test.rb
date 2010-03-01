@@ -59,7 +59,14 @@ class TestPublisher < Facebooker::Rails::Publisher
     from f
     fbml render(:inline=>"<%=module_helper_loaded%>")
   end
-
+  
+  def news_item(to)
+    send_as :news_item
+    recipients to
+    from nil
+    message "News"
+    news_action_link action_link("Source", "HREF")
+  end
 
   def profile_update(to,f)
     send_as :profile
@@ -528,5 +535,17 @@ class Facebooker::Rails::Publisher::PublisherTest < Test::Unit::TestCase
       notification=TestPublisher.create_render_notification(12451752,nil)
       assert_equal "true",notification.fbml
     end
+  end
+  
+  def test_create_news_item
+    news_item = TestPublisher.create_news_item(@user)
+    assert_equal Facebooker::Rails::Publisher::NewsItem,news_item.class
+    assert_equal "News", news_item.message
+    assert_equal({:text => "Source", :href => "HREF"}, news_item.news_action_link)
+  end
+  
+  def test_deliver_news_item
+    @user.expects(:add_news)
+    TestPublisher.deliver_news_item(@user)
   end
 end
