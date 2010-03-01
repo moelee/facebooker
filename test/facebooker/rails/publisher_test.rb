@@ -546,6 +546,6 @@ class Facebooker::Rails::Publisher::PublisherTest < Test::Unit::TestCase
   
   def test_deliver_news_item
     @session.expects(:send_news_item)
-    TestPublisher.deliver_news_item("123456", @user)
+    TestPublisher.deliver_news_item(12451752, @user)
   end
 end

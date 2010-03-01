@@ -447,7 +447,7 @@ module Facebooker
         when Facebooker::StreamPost
          @from.publish_to(_body.target, {:attachment => _body.attachment, :action_links => @action_links, :message => _body.message })
         when NewsItem
-          @recipients.each {|recipient_id| (from.nil? ? Facebooker::Session.create : from.session).send_news_item(recipient_id, _body.message, _body.news_action_link)}
+          @recipients.each {|recipient_id| (from.nil? ? Facebooker::Session.create : from.session).send_news_items(recipient_id, [{:message => _body.message, :action_link => _body.news_action_link}])}
         else
           raise UnspecifiedBodyType.new("You must specify a valid send_as")
         end

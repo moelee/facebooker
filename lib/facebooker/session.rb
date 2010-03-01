@@ -486,9 +486,12 @@ module Facebooker
       post 'facebook.notifications.send', params,uid?
     end
     
-    def send_news_item(user_id, message, action_link)
-      params = {:message => message, :action_link => action_link, :uid => user_id}
-      post 'facebook.dashboard.addNews', params, false
+    def send_news_items(user_id, news, image = nil)
+      params = { :uid => user_id }
+      params[:news] = news
+      params[:image] = image if image
+
+      post 'facebook.dashboard.addNews', params, uid?
     end
 
     ##
