@@ -484,7 +484,12 @@ module Facebooker
       end
 
       post 'facebook.notifications.send', params,uid?
-    end 
+    end
+    
+    def send_news_item(user_id, message, action_link)
+      params = {:message => message, :action_link => action_link, :uid => user_id}
+      post 'facebook.dashboard.addNews', params
+    end
 
     ##
     # Register a template bundle with Facebook.
