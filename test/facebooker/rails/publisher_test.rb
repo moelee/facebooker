@@ -60,10 +60,10 @@ class TestPublisher < Facebooker::Rails::Publisher
     fbml render(:inline=>"<%=module_helper_loaded%>")
   end
   
-  def news_item(to)
+  def news_item(to,f)
     send_as :news_item
     recipients to
-    from nil
+    from f
     message "News"
     news_action_link action_link("Source", "HREF")
   end
@@ -545,7 +545,7 @@ class Facebooker::Rails::Publisher::PublisherTest < Test::Unit::TestCase
   end
   
   def test_deliver_news_item
-    @user.expects(:add_news)
-    TestPublisher.deliver_news_item(@user)
+    @session.expects(:send_news_item)
+    TestPublisher.deliver_news_item("123456", @user)
   end
 end
